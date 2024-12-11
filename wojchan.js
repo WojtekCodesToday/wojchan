@@ -13,7 +13,7 @@
   let state = 0;
   window.addEventListener('mousemove', (e) => { m = [e.clientX, e.clientY] });
   const image = new Image(180, 120);
-  image.src = "sprite.png";
+  image.src = "https://raw.githubusercontent.com/WojtekCodesToday/wojchan/refs/heads/master/sprite.png";
   const rend = (x, y) => { ctx.drawImage(image, x * 30, y * 30, 30, 30, 0, 0, 30, 30) }
   let mv = 0;
   function animate() {
