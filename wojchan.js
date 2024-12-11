@@ -1,38 +1,43 @@
-const fps = 30;
-const canvas = document.createElement('canvas');
-canvas.width = 60;
-canvas.height = 60;
-canvas.style.position = 'fixed';
-canvas.style.pointerEvents = 'none';
-canvas.style.zIndex = '9999';
-canvas.style.imageRendering="pixelated";
-document.body.appendChild(canvas);
-const ctx = canvas.getContext('2d');
-let m = [];
-let c = [window.innerWidth / 2, window.innerHeight / 2];
-let state = 0;
-window.addEventListener('mousemove', (e) => {m[0] = e.clientX;m[1] = e.clientY;});
-const image = new Image(120,120);
-image.src = "sprite.png";
-const rend=(x,y)=>{ctx.drawImage(image, x, y, 60, 60, 0, 0, 60, 60)}
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const dx = m[0] - c[0];
-  const dy = m[1] - c[1];
-  const distance = Math.sqrt(dx * dx + dy * dy);
-  const angle = Math.atan2(dy, dx);
-  canvas.style.transform="scale("+(String(Math.floor(Math.cos(angle)))[0] == "-" ? "1" : "-1")+", 1)"
-  let spd=distance > 150 ? 8 : 4;
-  canvas.style.left = c[0]-30+"px";
-  canvas.style.top = c[1]-30+"px";
-  rend(0, 60)
-  state == 0 ? rend((Math.floor(c[0]+c[1]) + 1) % 4 * 60, 0) : rend(60, 0)
-  if (distance > 150)rend(60, 60)
-  state = distance > 15 ? 0 : 1;
-  if (distance > 15) {
-    c[0] += Math.cos(angle) * spd;
-    c[1] += Math.sin(angle) * spd;
+(function wojchan() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 61;
+  c.style.position = 'fixed';
+  c.style.pointerEvents = 'none';
+  c.style.zIndex = String(Number.MAX_VALUE);
+  c.style.imageRendering = "pixelated";
+  document.body.appendChild(c);
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  let m = [];
+  let cs = [window.innerWidth / 2, window.innerHeight / 2];
+  let state = 0;
+  window.addEventListener('mousemove', (e) => { m = [e.clientX, e.clientY] });
+  const image = new Image(180, 120);
+  image.src = "sprite.png";
+  const rend = (x, y) => { ctx.drawImage(image, x * 30, y * 30, 30, 30, 0, 0, 30, 30) }
+  let mv = 0;
+  function animate() {
+    const dx = m[0] - cs[0];
+    const dy = m[1] - cs[1];
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    const flip=Math.cos(angle) < 0;
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(2,2)
+    let spd = dist > 150 ? 8 : 4;
+    c.style.left = cs[0] - 30 + "px";
+    c.style.top = cs[1] - 30 + "px";
+    rend(0, 2);
+    mv = (mv + 1) % 4;
+    state == 0 ? rend(mv == 3 ? 1 : mv, flip) : rend(1, 0)
+    dist > 150 && rend(!flip+1, 2)
+    state = dist > 15 ? 0 : 1;
+    if (dist > 15) {
+      cs[0] += Math.cos(angle) * spd;
+      cs[1] += Math.sin(angle) * spd;
+    }
+    setTimeout(() => { requestAnimationFrame(animate) }, 70);
   }
-  setTimeout(()=>{requestAnimationFrame(animate)}, 1000 / fps);
-}
-image.onload = animate();
+  image.onload = animate();
+})();
